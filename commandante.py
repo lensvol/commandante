@@ -27,11 +27,13 @@ if __name__ == '__main__':
         source_code = fp.read()
 
     red = RedBaron(source_code)
-    lists = red.find_all('list')
 
-    for list_node in lists:
-        if is_without_trailing_comma(list_node.fst()):
-            line, column = list_node.absolute_bounding_box.bottom_right.to_tuple()
-            print '{0}:{1}:{2}: Y001 trailing comma mising'.format(
-                source_file_fn, line, column,
-            )
+    for collection_type in ('list', 'dict', 'tuple', 'set'):
+        nodes = red.find_all(collection_type)
+
+        for node in nodes:
+            if is_without_trailing_comma(node.fst()):
+                line, column = node.absolute_bounding_box.bottom_right.to_tuple()
+                print '{0}:{1}:{2}: Y001 trailing comma mising'.format(
+                    source_file_fn, line, column,
+                )
