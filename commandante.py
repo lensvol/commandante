@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from functools import partial
+from itertools import chain
 import sys
 
 from baron.path import node_to_bounding_box
@@ -17,6 +19,17 @@ def is_without_trailing_comma(fst):
     )
 
 
+def find_missing_commas(red, collection_type):
+    nodes = red.find_all(collection_type)
+    positions = []
+
+    for node in nodes:
+        if is_without_trailing_comma(node.fst()):
+            bounds = node.absolute_bounding_box
+            line, column = bounds .bottom_right.to_tuple()
+            yield line, column
+
+
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
         print 'No arguments. :-('
@@ -28,12 +41,15 @@ if __name__ == '__main__':
 
     red = RedBaron(source_code)
 
-    for collection_type in ('list', 'dict', 'tuple', 'set'):
-        nodes = red.find_all(collection_type)
+    collections = ('list', 'dict', 'tuple', 'set')
+    positions = map(
+        partial(find_missing_commas, red),
+        collections,
+    )
 
-        for node in nodes:
-            if is_without_trailing_comma(node.fst()):
-                line, column = node.absolute_bounding_box.bottom_right.to_tuple()
-                print '{0}:{1}:{2}: Y001 trailing comma mising'.format(
-                    source_file_fn, line, column,
-                )
+    positions = sorted(chain(*positions))
+    for line, column in positions:
+        print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
+            source_file_fn, line, column,
+        )
+    exit(positions and 1 or 0)
