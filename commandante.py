@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import click
+
 from functools import partial
 from itertools import chain
 import sys
@@ -30,13 +32,10 @@ def find_missing_commas(red, collection_type):
             yield line, column
 
 
-if __name__ == '__main__':
-    if len(sys.argv) <= 1:
-        print 'No arguments. :-('
-        exit(-1)
-
-    source_file_fn = sys.argv[1]
-    with open(source_file_fn, 'r') as fp:
+@click.command()
+@click.argument('filename', nargs=1)
+def processor(filename):
+    with open(filename, 'r') as fp:
         source_code = fp.read()
 
     red = RedBaron(source_code)
@@ -50,6 +49,10 @@ if __name__ == '__main__':
     positions = sorted(chain(*positions))
     for line, column in positions:
         print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
-            source_file_fn, line, column,
+            filename, line, column,
         )
     exit(positions and 1 or 0)
+
+
+if __name__ == '__main__':
+    processor()
