@@ -36,7 +36,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'commandante = commandante.main:processor'
-        ]
+            'commandante = commandante.main:processor',
+        ],
     },
 )

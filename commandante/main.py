@@ -12,7 +12,15 @@ from redbaron import RedBaron
 
 def is_without_trailing_comma(fst):
     contents = fst['value']
-    trailing_formatting = fst['third_formatting']
+    trailing_formatting = []
+
+    for fmt_type in (
+        'first_formatting',
+        'second_formatting',
+        'third_formatting',
+        'fourth_formatting',
+    ):
+        trailing_formatting.extend(fst[fmt_type])
 
     return (
         trailing_formatting
