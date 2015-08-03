@@ -4,9 +4,7 @@ import click
 
 from functools import partial
 from itertools import chain
-import sys
 
-from baron.path import node_to_bounding_box
 from redbaron import RedBaron
 
 
@@ -35,8 +33,8 @@ def find_missing_commas(red, collection_type):
 
     for node in nodes:
         if is_without_trailing_comma(node.fst()):
-            bounds = node.absolute_bounding_box
-            line, column = bounds .bottom_right.to_tuple()
+            bounds = node.value[-1].absolute_bounding_box
+            line, column = bounds.bottom_right.to_tuple()
             yield line, column
 
 
