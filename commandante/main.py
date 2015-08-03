@@ -29,7 +29,6 @@ def is_without_trailing_comma(fst):
 
 def find_missing_commas(red, collection_type):
     nodes = red.find_all(collection_type)
-    positions = []
 
     for node in nodes:
         if is_without_trailing_comma(node.fst()):

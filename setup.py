@@ -27,7 +27,8 @@ setup(
     packages=['commandante'],
     long_description='Extract FIXME/TODO notes from Python source file.',
     install_requires=[
-        'click>=3.0',
+        'click>=4.1',
+        'redbaron>=0.5.1',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
