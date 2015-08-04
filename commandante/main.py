@@ -38,25 +38,29 @@ def find_missing_commas(red, collection_type):
 
 
 @click.command()
-@click.argument('filename', nargs=1)
-def processor(filename):
-    with open(filename, 'r') as fp:
-        source_code = fp.read()
+@click.argument('filenames', nargs=-1)
+def processor(filenames):
+    found = False
 
-    red = RedBaron(source_code)
+    for filename in filenames:
+        with open(filename, 'r') as fp:
+            source_code = fp.read()
 
-    collections = ('list', 'dict', 'tuple', 'set')
-    positions = map(
-        partial(find_missing_commas, red),
-        collections,
-    )
+        red = RedBaron(source_code)
 
-    positions = sorted(chain(*positions))
-    for line, column in positions:
-        print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
-            filename, line, column,
+        collections = ('list', 'dict', 'tuple', 'set')
+        positions = map(
+            partial(find_missing_commas, red),
+            collections,
         )
-    exit(positions and 1 or 0)
+
+        positions = sorted(chain(*positions))
+        for line, column in positions:
+            print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
+                filename, line, column,
+            )
+
+    exit(found and 1 or 0)
 
 
 if __name__ == '__main__':
