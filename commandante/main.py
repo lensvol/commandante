@@ -20,10 +20,20 @@ def is_without_trailing_comma(fst):
     ):
         trailing_formatting.extend(fst[fmt_type])
 
+    # If call has no arguments, we have no work to do
+    if not contents:
+        return False
+
+    last_token = contents[-1]
+    if last_token['type'] == 'dict_argument':
+        # Python 2 syntax forbids putting trailing comma after
+        # unpacking dict argument (like **d)
+        return False
+
     return (
         trailing_formatting
         and trailing_formatting[-1]['type'] == 'endl'
-        and contents[-1]['type'] != 'comma'
+        and last_token['type'] != 'comma'
     )
 
 
@@ -48,14 +58,15 @@ def processor(filenames):
 
         red = RedBaron(source_code)
 
-        collections = ('list', 'dict', 'tuple', 'set')
+        node_types = ('list', 'dict', 'tuple', 'set', 'call')
         positions = map(
             partial(find_missing_commas, red),
-            collections,
+            node_types,
         )
 
         positions = sorted(chain(*positions))
         for line, column in positions:
+            found = True
             print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
                 filename, line, column,
             )
