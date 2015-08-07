@@ -42,14 +42,16 @@ def find_missing_commas(red, collection_type):
 
     for node in nodes:
         if is_without_trailing_comma(node.fst()):
-            bounds = node.value[-1].absolute_bounding_box
+            last_value = node.value[-1]
+            bounds = last_value.absolute_bounding_box
             line, column = bounds.bottom_right.to_tuple()
-            yield line, column
+            yield last_value, line, column
 
 
 @click.command()
 @click.argument('filenames', nargs=-1)
-def processor(filenames):
+@click.option('--autofix/--no-autofix', default=False, help='Attempt to insert missing commas upon detection.')
+def processor(filenames, autofix):
     found = False
 
     for filename in filenames:
@@ -65,11 +67,16 @@ def processor(filenames):
         )
 
         positions = sorted(chain(*positions))
-        for line, column in positions:
+        for node, line, column in positions:
             found = True
             print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
                 filename, line, column,
             )
+            node.replace(node.dumps() + ',')
+
+        if found and autofix:
+            with open(filename, 'w') as fp:
+                fp.write(red.dumps())
 
     exit(found and 1 or 0)
 
