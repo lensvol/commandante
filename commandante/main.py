@@ -72,7 +72,8 @@ def processor(filenames, autofix):
             print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
                 filename, line, column,
             )
-            node.replace(node.dumps() + ',')
+            if autofix:
+                node.replace(node.dumps() + ',')
 
         if found and autofix:
             with open(filename, 'w') as fp:
