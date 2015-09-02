@@ -5,6 +5,8 @@ import click
 from functools import partial
 from itertools import chain
 
+from baron.parser import ParsingError
+from baron.utils import BaronError
 from redbaron import RedBaron
 
 
@@ -58,7 +60,11 @@ def processor(filenames, autofix):
         with open(filename, 'r') as fp:
             source_code = fp.read()
 
-        red = RedBaron(source_code)
+        try:
+            red = RedBaron(source_code)
+        except BaronError:
+            print '[ERROR] Failed to parse {0} :-('.format(filename)
+            continue
 
         node_types = ('list', 'dict', 'tuple', 'set', 'call')
         positions = map(
@@ -69,11 +75,17 @@ def processor(filenames, autofix):
         positions = sorted(chain(*positions))
         for node, line, column in positions:
             found = True
-            print '{0}:{1}:{2}: Y001 missing trailing comma'.format(
+            position_str = '{0}:{1}:{2}'.format(
                 filename, line, column,
             )
+            print '{0}: Y001 missing trailing comma'.format(position_str)
+
             if autofix:
-                node.replace(node.dumps() + ',')
+                try:
+                    node.replace(node.dumps() + ',')
+                except ParsingError, e:
+                    print '[ERROR] Failed to fix missing comma ' \
+                          'due to parsing error ({0})'.format(position_str)
 
         if found and autofix:
             with open(filename, 'w') as fp:
