@@ -4,6 +4,9 @@ import os
 from setuptools import setup, Command
 
 
+DESCRIPTION = 'Find and fix missing trailing commas in Python collections.'
+
+
 def get_version():
     with open('commandante/__init__.py') as f:
         for line in f:
@@ -20,12 +23,12 @@ setup(
     version=get_version(),
     author='Kirill Borisov',
     author_email='lensvol@gmail.com',
-    description='Extract FIXME/TODO notes from Python source file.',
+    description=DESCRIPTION,
     license='MIT',
     keywords='commandante',
     url='https://github.com/lensvol/commandante',
     packages=['commandante'],
-    long_description='Extract FIXME/TODO notes from Python source file.',
+    long_description=DESCRIPTION,
     install_requires=[
         'click>=4.1',
         'redbaron>=0.5.1',
