@@ -7,7 +7,10 @@ from itertools import chain
 
 from baron.parser import ParsingError
 from baron.utils import BaronError
-from redbaron import RedBaron
+from redbaron import (
+    Node,
+    RedBaron,
+)
 
 
 def is_without_trailing_comma(fst):
@@ -55,6 +58,11 @@ def find_missing_commas(red, collection_type):
 @click.option('--autofix/--no-autofix', default=False, help='Attempt to insert missing commas upon detection.')
 def processor(filenames, autofix):
     found = False
+    comma_node = Node.from_fst({
+        'first_formatting': [],
+        'second_formatting': [],
+        'type': 'comma',
+    })
 
     for filename in filenames:
         with open(filename, 'r') as fp:
@@ -78,14 +86,16 @@ def processor(filenames, autofix):
             position_str = '{0}:{1}:{2}'.format(
                 filename, line, column,
             )
-            print '{0}: Y001 missing trailing comma'.format(position_str)
 
             if autofix:
                 try:
-                    node.replace(node.dumps() + ',')
+                    node.parent.node_list.append(comma_node)
+                    print '[INFO] Missing comma inserted ({0})'.format(position_str)
                 except ParsingError, e:
                     print '[ERROR] Failed to fix missing comma ' \
                           'due to parsing error ({0})'.format(position_str)
+            else:
+                print '{0}: Y001 missing trailing comma'.format(position_str)
 
         if found and autofix:
             with open(filename, 'w') as fp:
