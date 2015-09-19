@@ -48,7 +48,11 @@ def find_missing_commas(red, collection_type):
         if is_without_trailing_comma(node):
             last_value = node.value[-1]
             bounds = last_value.absolute_bounding_box
-            line, column = bounds.bottom_right.to_tuple()
+            top_left = bounds.top_left.to_tuple()
+            bottom_right = bounds.bottom_right.to_tuple()
+
+            # Sometimes right boundary determined incorrectly
+            line, column = top_left if bottom_right[1] == 0 else bottom_right
             yield last_value, line, column
 
 
