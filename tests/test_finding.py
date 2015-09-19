@@ -120,4 +120,4 @@ def test_finding_commas():
             positions = sorted(positions)
             results = sorted(results, key=lambda c: (c[1], c[2]))
             results = [(c[1], c[2]) for c in results]
-            assert positions == results
+            assert positions == results, sample
