@@ -13,19 +13,18 @@ from redbaron import (
 )
 
 
-def is_without_trailing_comma(fst):
+def is_without_trailing_comma(node):
+    fst = node.fst()
     contents = fst['value']
     trailing_formatting = []
 
     for fmt_type in (
-        'first_formatting',
         'second_formatting',
         'third_formatting',
-        'fourth_formatting',
     ):
         trailing_formatting.extend(fst[fmt_type])
 
-    # If call has no arguments, we have no work to do
+    # If collection has no elements, we have no work to do
     if not contents:
         return False
 
@@ -46,7 +45,7 @@ def find_missing_commas(red, collection_type):
     nodes = red.find_all(collection_type)
 
     for node in nodes:
-        if is_without_trailing_comma(node.fst()):
+        if is_without_trailing_comma(node):
             last_value = node.value[-1]
             bounds = last_value.absolute_bounding_box
             line, column = bounds.bottom_right.to_tuple()
@@ -91,7 +90,7 @@ def processor(filenames, autofix):
                 try:
                     node.parent.node_list.append(comma_node)
                     print '[INFO] Missing comma inserted ({0})'.format(position_str)
-                except ParsingError, e:
+                except ParsingError:
                     print '[ERROR] Failed to fix missing comma ' \
                           'due to parsing error ({0})'.format(position_str)
             else:
